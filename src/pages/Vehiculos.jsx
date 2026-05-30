@@ -172,15 +172,14 @@ function Vehiculos() {
       if (imagenFile) {
         const formData = new FormData();
         formData.append("imagen", imagenFile);
-
+            
         const res = await http.post("/upload/imagen", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-
-        const data = await res.json();
-        imagenUrl = data.url;
+      
+        imagenUrl = res.data.url;
       }
 
       await createVehiculo({
