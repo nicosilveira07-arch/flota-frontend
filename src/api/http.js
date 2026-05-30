@@ -24,17 +24,25 @@ http.interceptors.request.use(
 );
 
 // RESPONSE INTERCEPTOR
-http.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.log("API ERROR:", {
-      message: error.message,
-      status: error.response?.status || "NO_STATUS",
-      data: error.response?.data || "NO_RESPONSE"
+http.interceptors.request.use(
+  (config) => {
+    console.log("REQUEST:", {
+      baseURL: config.baseURL,
+      url: config.url,
+      completa: `${config.baseURL}${config.url}`,
     });
 
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
     return Promise.reject(error);
   }
-)
+);
 console.log("VITE_API_URL =", import.meta.env.VITE_API_URL);
 export default http;
