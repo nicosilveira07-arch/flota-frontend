@@ -36,5 +36,5 @@ http.interceptors.response.use(
     return Promise.reject(error);
   }
 )
-
+console.log("VITE_API_URL =", import.meta.env.VITE_API_URL);
 export default http;
