@@ -38,7 +38,11 @@ export default function Usuarios() {
   };
 
   useEffect(() => {
-    cargar();
+    const token = localStorage.getItem("token");
+    
+    if (token) {
+      cargar();
+    }
   }, []);
 
   const handleChange = (e) => {
