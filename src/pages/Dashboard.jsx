@@ -8,7 +8,7 @@ import {
   FaCheckCircle,
   FaTimes,
 } from "react-icons/fa";
-
+import { getImageUrl } from "../helpers/image";
 import {
   getVehiculos,
   elegirVehiculo,
@@ -26,6 +26,7 @@ const [reservas, setReservas] =
 
 const [modalElegir, setModalElegir] =
   useState(false);
+
 
 const [modalFinalizar, setModalFinalizar] =
   useState(false);
@@ -267,6 +268,17 @@ const confirmarReserva = async () => {
       (r) =>
         r.estado === "PENDIENTE"
       ).length;
+  const tieneReservaActiva = reservas.some(
+    (r) =>
+      r.estado === "PENDIENTE" ||
+      r.estado === "APROBADA"
+  );
+  const tieneVehiculoEnUso = vehiculos.some(
+    (v) =>
+      v.estado === "EN USO" &&
+      v.operativo_usuario_id === user?.id
+  );
+
   return (
     <div className="space-y-10">
 
@@ -434,10 +446,8 @@ const confirmarReserva = async () => {
             >
               
               <img
-                src={
-                  v.imagen ||
-                  "https://placehold.co/600x400?text=Vehiculo"
-                }
+                src={getImageUrl(v.imagen)}
+                
                 alt={v.modelo}
                 className="w-full h-52 object-cover"
               />
@@ -598,7 +608,9 @@ const confirmarReserva = async () => {
 
                 <div className="mt-5 flex flex-col gap-3">
 
-                  {v.estado === "LIBRE" && (
+                  {v.estado === "LIBRE" &&
+                   !tieneReservaActiva &&
+                   !tieneVehiculoEnUso && (
                     <button
                       onClick={() =>
                         abrirElegirVehiculo(v)
@@ -626,7 +638,9 @@ const confirmarReserva = async () => {
                       </button>
                   )}
 
-                  {v.estado === "LIBRE" && (
+                  {v.estado === "LIBRE" &&
+                   !tieneReservaActiva &&
+                   !tieneVehiculoEnUso && (
                     <button
                       onClick={() => abrirReserva(v)}
                       className="

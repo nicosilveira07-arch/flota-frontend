@@ -55,12 +55,10 @@ export const finalizarVehiculo = async (id, data) => {
 ========================= */
 
 export const radiarVehiculo = async (id, data) => {
-  const res = await http.put(
-    `/vehiculos/${id}`,
-    data
-  );
-
-  return res.data;
+  return await http.put(`/vehiculos/${id}`, {
+    ...data,
+    estado: "RADIADO"
+  });
 };
 
 /* =========================

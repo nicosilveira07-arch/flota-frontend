@@ -28,12 +28,13 @@ http.interceptors.response.use(
   (response) => response,
   (error) => {
     console.log("API ERROR:", {
-      status: error.response?.status,
-      data: error.response?.data
+      message: error.message,
+      status: error.response?.status || "NO_STATUS",
+      data: error.response?.data || "NO_RESPONSE"
     });
 
     return Promise.reject(error);
   }
-);
+)
 
 export default http;

@@ -6,7 +6,7 @@ import {
   FaPlus,
   FaTools,
 } from "react-icons/fa";
-
+import { getImageUrl } from "../helpers/image";
 import {
   getVehiculos,
   createVehiculo,
@@ -17,7 +17,7 @@ import {
   radiarVehiculo,
   getHistorialVehiculo,
 } from "../api/vehiculos.api";
-
+import http from "../api/http";
 const EMPTY_FORM = {
   tipo: "",
   marca: "",
@@ -42,6 +42,12 @@ const EMPTY_FINALIZAR_FORM = {
 function Vehiculos() {
   const [vehiculos, setVehiculos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [imagenFile, setImagenFile] = useState(null);
+  const [operativoForm, setOperativoForm] = useState(EMPTY_OPERATIVO_FORM);
+  const [finalizarForm, setFinalizarForm] = useState(EMPTY_FINALIZAR_FORM);
+
+  const [vehiculoOperativo, setVehiculoOperativo] = useState(null);
+  const [vehiculoFinalizar, setVehiculoFinalizar] = useState(null);
 
   const [vehiculoEditando, setVehiculoEditando] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -59,8 +65,9 @@ function Vehiculos() {
   const usuario = JSON.parse(localStorage.getItem("user"));
 
   const esAdminOIngeniero =
-    usuario?.rol?.toLowerCase() === "administrador" ||
-    usuario?.rol?.toLowerCase() === "ingeniero";
+    ["administrador", "ingeniero", "pistero"].includes(
+      usuario?.rol?.toLowerCase()
+    );
 
   useEffect(() => {
     cargarVehiculos();
@@ -136,6 +143,9 @@ function Vehiculos() {
           : value,
     }));
   };
+  const handleImageChange = (e) => {
+    setImagenFile(e.target.files[0]);
+  };
 
   const handleOperativoChange = (e) => {
     const { name, value } = e.target;
@@ -157,14 +167,33 @@ function Vehiculos() {
     e.preventDefault();
 
     try {
+      let imagenUrl = "";
+
+      if (imagenFile) {
+        const formData = new FormData();
+        formData.append("imagen", imagenFile);
+
+        const res = await http.post("/upload/imagen", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        const data = await res.json();
+        imagenUrl = data.url;
+      }
+
       await createVehiculo({
         ...form,
+        imagen: imagenUrl,
         estado: "LIBRE",
       });
 
       await cargarVehiculos();
       limpiarForm();
       setMostrarFormulario(false);
+      setImagenFile(null);
+
     } catch (error) {
       console.log(error);
     }
@@ -184,27 +213,42 @@ function Vehiculos() {
     });
   };
 
- const guardarEdicion = async (e) => {
-  e.preventDefault();
+  const guardarEdicion = async (e) => {
+    e.preventDefault();
 
-  try {
-    await updateVehiculo(vehiculoEditando.id, {
-      ...form,
-      estado: vehiculoEditando.estado,
-      motivo_radiado: vehiculoEditando.motivo_radiado || null,
-    });
+    try {
+      let imagenUrl = form.imagen;
 
-    await cargarVehiculos();
+      if (imagenFile) {
+        const formData = new FormData();
+        formData.append("imagen", imagenFile);
 
-    setVehiculoEditando(null);
-    setMostrarFormulario(false);
+        const res = await http.post("/upload/imagen", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-    limpiarForm();
+        imagenUrl = res.data.url;
+      }
 
-  } catch (error) {
-    console.log(error);
-  }
-};
+      await updateVehiculo(vehiculoEditando.id, {
+        ...form,
+        imagen: imagenUrl,
+        estado: vehiculoEditando.estado,
+        motivo_radiado: vehiculoEditando.motivo_radiado || null,
+      });
+
+      await cargarVehiculos();
+      setVehiculoEditando(null);
+      setMostrarFormulario(false);
+      limpiarForm();
+      setImagenFile(null);
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -343,7 +387,7 @@ function Vehiculos() {
           >
             <div className="relative">
               <img
-                src={v.imagen || "https://placehold.co/600x400?text=Vehiculo"}
+                src={getImageUrl(v.imagen)}
                 alt={v.modelo || "Vehiculo"}
                 className="w-full h-56 object-cover"
               />
@@ -597,10 +641,9 @@ function Vehiculos() {
               />
 
               <input
-                name="imagen"
-                value={form.imagen}
-                onChange={handleChange}
-                placeholder="URL Imagen"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
                 className="border p-4 rounded-2xl md:col-span-2"
               />
 
