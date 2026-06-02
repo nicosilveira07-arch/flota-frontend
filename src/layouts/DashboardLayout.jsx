@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import {
   FaCar,
   FaClipboardList,
@@ -21,9 +22,31 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const usuario = JSON.parse(localStorage.getItem("user")) || {};
+  const [menuUsuario, setMenuUsuario] = useState(false);
+  const menuRef = useRef(null);
 
+  const usuario = JSON.parse(localStorage.getItem("user")) || {};
   const rol = (usuario?.rol || "").toUpperCase();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setMenuUsuario(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+    };
+  }, []);
 
   const cerrarSesion = () => {
     localStorage.removeItem("token");
@@ -31,8 +54,13 @@ export default function DashboardLayout() {
     navigate("/login");
   };
 
-  const puedeVerVehiculos = ["ADMINISTRADOR", "INGENIERO", "PISTERO"].includes(rol);
-  const puedeVerUsuarios = [ "INGENIERO"].includes(rol);
+  const puedeVerVehiculos = [
+    "ADMINISTRADOR",
+    "INGENIERO",
+    "PISTERO",
+  ].includes(rol);
+
+  const puedeVerUsuarios = ["INGENIERO"].includes(rol);
 
   const menu = [
     { name: "Inicio", path: "/", icon: <FaHome /> },
@@ -41,9 +69,17 @@ export default function DashboardLayout() {
       ? [{ name: "Vehículos", path: "/vehiculos", icon: <FaCar /> }]
       : []),
 
-    { name: "Operativos", path: "/operativos", icon: <FaClipboardList /> },
+    {
+      name: "Operativos",
+      path: "/operativos",
+      icon: <FaClipboardList />,
+    },
 
-    { name: "Reservas", path: "/reservas", icon: <FaCalendarAlt /> },
+    {
+      name: "Reservas",
+      path: "/reservas",
+      icon: <FaCalendarAlt />,
+    },
 
     ...(puedeVerUsuarios
       ? [{ name: "Usuarios", path: "/usuarios", icon: <FaUsers /> }]
@@ -51,7 +87,8 @@ export default function DashboardLayout() {
   ];
 
   const titulo =
-    menu.find((m) => m.path === location.pathname)?.name || "Dashboard";
+    menu.find((m) => m.path === location.pathname)?.name ||
+    "Dashboard";
 
   return (
     <div className="flex min-h-screen bg-[#F4F7FB]">
@@ -67,8 +104,12 @@ export default function DashboardLayout() {
             </div>
 
             <div>
-              <h1 className="text-xl font-black">GUARDIA REPUBLICANA</h1>
-              <p className="text-sm text-blue-100">FLOTA VEHICULAR</p>
+              <h1 className="text-xl font-black">
+                GUARDIA REPUBLICANA
+              </h1>
+              <p className="text-sm text-blue-100">
+                FLOTA VEHICULAR
+              </p>
             </div>
           </div>
         </div>
@@ -85,7 +126,11 @@ export default function DashboardLayout() {
                 className={`
                   flex items-center gap-4 px-5 py-4 rounded-2xl font-medium
                   transition-all duration-200
-                  ${active ? "bg-blue-600 text-white shadow-lg" : "text-blue-100 hover:bg-blue-900"}
+                  ${
+                    active
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "text-blue-100 hover:bg-blue-900"
+                  }
                 `}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -95,16 +140,6 @@ export default function DashboardLayout() {
           })}
         </nav>
 
-        {/* FOOTER */}
-        <div className="p-5 border-t border-blue-900">
-          <button
-            onClick={cerrarSesion}
-            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-red-200 hover:bg-red-500/20"
-          >
-            <FaSignOutAlt />
-            Salir
-          </button>
-        </div>
       </aside>
 
       {/* CONTENIDO */}
@@ -120,6 +155,7 @@ export default function DashboardLayout() {
               <h1 className="text-2xl font-black text-gray-800">
                 {titulo}
               </h1>
+
               <p className="text-sm text-gray-500">
                 Gestión operativa de flota
               </p>
@@ -131,18 +167,49 @@ export default function DashboardLayout() {
 
             <NotificationBell />
 
-            <div className="flex items-center gap-4">
-              <img
-                src={usuario?.foto || "https://i.pravatar.cc/150?img=12"}
-                className="w-14 h-14 rounded-full object-cover border-2 border-blue-500"
-              />
+            <div
+              className="relative"
+              ref={menuRef}
+            >
+              <button
+                onClick={() =>
+                  setMenuUsuario(!menuUsuario)
+                }
+                className="flex items-center gap-4 hover:bg-gray-100 px-3 py-2 rounded-xl transition"
+              >
+                <img
+                  src={
+                    usuario?.foto ||
+                    "https://i.pravatar.cc/150?img=12"
+                  }
+                  alt="Usuario"
+                  className="w-14 h-14 rounded-full object-cover border-2 border-blue-500"
+                />
 
-              <div>
-                <p className="font-bold text-gray-800">
-                  {`${usuario?.nombre || ""} ${usuario?.apellido || ""}`.trim()}
-                </p>
-                <p className="text-sm text-gray-500 uppercase">{rol}</p>
-              </div>
+                <div className="text-left">
+                  <p className="font-bold text-gray-800">
+                    {`${usuario?.nombre || ""} ${
+                      usuario?.apellido || ""
+                    }`.trim()}
+                  </p>
+
+                  <p className="text-sm text-gray-500 uppercase">
+                    {rol}
+                  </p>
+                </div>
+              </button>
+
+              {menuUsuario && (
+                <div className="absolute right-0 top-20 w-56 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                  <button
+                    onClick={cerrarSesion}
+                    className="w-full flex items-center gap-3 px-4 py-4 text-red-600 hover:bg-red-50 transition"
+                  >
+                    <FaSignOutAlt />
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
             </div>
 
           </div>
@@ -155,6 +222,7 @@ export default function DashboardLayout() {
         </main>
 
       </div>
+
     </div>
   );
 }
