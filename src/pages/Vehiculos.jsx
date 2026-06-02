@@ -144,7 +144,17 @@ function Vehiculos() {
     }));
   };
   const handleImageChange = (e) => {
-    setImagenFile(e.target.files[0]);
+    const file = e.target.files[0];
+    
+    if (!file) return;
+    
+    const reader = new FileReader();
+    
+    reader.onloadend = () => {
+      setImagenFile(reader.result);
+    };
+  
+    reader.readAsDataURL(file);
   };
 
   const handleOperativoChange = (e) => {
@@ -167,20 +177,8 @@ function Vehiculos() {
     e.preventDefault();
 
     try {
-      let imagenUrl = "";
-
-      if (imagenFile) {
-        const formData = new FormData();
-        formData.append("imagen", imagenFile);
-            
-        const res = await http.post("/upload/imagen", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+      const imagenUrl = imagenFile || "";
       
-        imagenUrl = res.data.url;
-      }
 
       await createVehiculo({
         ...form,
@@ -214,36 +212,27 @@ function Vehiculos() {
 
   const guardarEdicion = async (e) => {
     e.preventDefault();
-
+    
     try {
       let imagenUrl = form.imagen;
-
+    
       if (imagenFile) {
-        const formData = new FormData();
-        formData.append("imagen", imagenFile);
-
-        const res = await http.post("/upload/imagen", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        imagenUrl = res.data.url;
+        imagenUrl = imagenFile;
       }
-
+    
       await updateVehiculo(vehiculoEditando.id, {
         ...form,
         imagen: imagenUrl,
         estado: vehiculoEditando.estado,
         motivo_radiado: vehiculoEditando.motivo_radiado || null,
       });
-
+    
       await cargarVehiculos();
       setVehiculoEditando(null);
       setMostrarFormulario(false);
       limpiarForm();
       setImagenFile(null);
-
+    
     } catch (error) {
       console.log(error);
     }
