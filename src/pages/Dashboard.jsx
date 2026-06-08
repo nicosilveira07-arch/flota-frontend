@@ -402,7 +402,7 @@ const confirmarReserva = async () => {
           <input
             type="text"
             placeholder="Buscar por matrícula..."
-            value={filtroMatricula}
+            value={filtroMatricula.toUpperCase()}
             onChange={(e) => setFiltroMatricula(e.target.value)}
             className="w-full md:w-96 border p-3 rounded-2xl"
           />
@@ -458,11 +458,11 @@ const confirmarReserva = async () => {
 
                   <div>
                     <h2 className="text-2xl font-black text-gray-800">
-                      {v.marca}
+                      {v.marca?.toUpperCase()}
                     </h2>
 
                     <p className="text-gray-500">
-                      {v.modelo}
+                      {v.modelo?.toUpperCase()}
                     </p>
                   </div>
 
@@ -499,7 +499,7 @@ const confirmarReserva = async () => {
                       Matrícula
                     </span>
                                   
-                    <span>{v.matricula}</span>
+                    <span>{v.matricula?.toUpperCase()}</span>
                   </div>
                                   
                   <div className="flex justify-between">
@@ -515,7 +515,7 @@ const confirmarReserva = async () => {
                       Tipo
                     </span>
                                   
-                    <span>{v.tipo}</span>
+                    <span>{v.tipo?.toUpperCase()}</span>
                   </div>
                                   
                   {/* =========================

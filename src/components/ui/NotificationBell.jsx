@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaBell } from "react-icons/fa";
 import {
   getNotificaciones,
@@ -10,12 +10,17 @@ export default function NotificationBell() {
   const [notificaciones, setNotificaciones] = useState([]);
   const [open, setOpen] = useState(false);
 
+  const bellRef = useRef(null);
+
   const cargar = async () => {
     try {
       const data = await getNotificaciones();
       setNotificaciones(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.log("Error notificaciones:", error?.response?.status);
+      console.log(
+        "Error notificaciones:",
+        error?.response?.status
+      );
     }
   };
 
@@ -25,15 +30,26 @@ export default function NotificationBell() {
     const cargarSeguro = async () => {
       try {
         const data = await getNotificaciones();
-        if (active) setNotificaciones(Array.isArray(data) ? data : []);
+
+        if (active) {
+          setNotificaciones(
+            Array.isArray(data) ? data : []
+          );
+        }
       } catch (error) {
-        console.log("Error notificaciones:", error?.response?.status);
+        console.log(
+          "Error notificaciones:",
+          error?.response?.status
+        );
       }
     };
 
     cargarSeguro();
 
-    const interval = setInterval(cargarSeguro, 10000);
+    const interval = setInterval(
+      cargarSeguro,
+      10000
+    );
 
     return () => {
       active = false;
@@ -41,7 +57,32 @@ export default function NotificationBell() {
     };
   }, []);
 
-  const noLeidas = notificaciones.filter(n => !n.leida).length;
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        bellRef.current &&
+        !bellRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+    };
+  }, []);
+
+  const noLeidas = notificaciones.filter(
+    (n) => !n.leida
+  ).length;
 
   const marcar = async (id) => {
     try {
@@ -62,8 +103,10 @@ export default function NotificationBell() {
   };
 
   return (
-    <div className="relative">
-
+    <div
+      className="relative"
+      ref={bellRef}
+    >
       {/* BELL */}
       <button
         onClick={() => setOpen(!open)}
@@ -82,13 +125,11 @@ export default function NotificationBell() {
       {/* DROPDOWN */}
       {open && (
         <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg overflow-hidden z-50">
-
           <div className="p-3 border-b font-bold">
             Notificaciones
           </div>
 
           <div className="max-h-96 overflow-auto">
-
             {notificaciones.length === 0 && (
               <p className="p-3 text-sm text-gray-500">
                 Sin notificaciones
@@ -99,10 +140,11 @@ export default function NotificationBell() {
               <div
                 key={n.id}
                 className={`p-3 border-b text-sm flex justify-between items-center ${
-                  n.leida ? "bg-white" : "bg-blue-50"
+                  n.leida
+                    ? "bg-white"
+                    : "bg-blue-50"
                 }`}
               >
-
                 <span
                   className="cursor-pointer flex-1"
                   onClick={() => marcar(n.id)}
@@ -116,10 +158,8 @@ export default function NotificationBell() {
                 >
                   ✕
                 </button>
-
               </div>
             ))}
-
           </div>
         </div>
       )}
