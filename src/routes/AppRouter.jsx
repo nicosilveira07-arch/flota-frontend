@@ -8,6 +8,7 @@ import Vehiculos from "../pages/Vehiculos";
 import Reservas from "../pages/Reservas";
 import Operativos from "../pages/Operativos";
 import Usuarios from "../pages/Usuarios";
+import MiPerfil from "../pages/MiPerfil";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -39,6 +40,7 @@ export default function AppRouter() {
           <Route path="reservas" element={<Reservas />} />
           <Route path="operativos" element={<Operativos />} />
           <Route path="usuarios" element={<Usuarios />} />
+          <Route path="perfil" element={<MiPerfil />} />
         </Route>
 
       </Routes>

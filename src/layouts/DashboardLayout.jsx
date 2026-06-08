@@ -7,6 +7,7 @@ import {
   FaSignOutAlt,
   FaHome,
   FaBars,
+  FaUserCog
 } from "react-icons/fa";
 
 import {
@@ -177,14 +178,9 @@ export default function DashboardLayout() {
                 }
                 className="flex items-center gap-4 hover:bg-gray-100 px-3 py-2 rounded-xl transition"
               >
-                <img
-                  src={
-                    usuario?.foto ||
-                    "https://i.pravatar.cc/150?img=12"
-                  }
-                  alt="Usuario"
-                  className="w-14 h-14 rounded-full object-cover border-2 border-blue-500"
-                />
+                <div className="w-14 h-14 rounded-full bg-blue-600 border-2 border-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                  {`${usuario?.nombre?.[0] || ""}${usuario?.apellido?.[0] || ""}`.toUpperCase()}
+                </div>
 
                 <div className="text-left">
                   <p className="font-bold text-gray-800">
@@ -200,14 +196,27 @@ export default function DashboardLayout() {
               </button>
 
               {menuUsuario && (
-                <div className="absolute right-0 top-20 w-56 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                <div className="absolute right-0 top-20 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+              
+                  <button
+                    onClick={() => {
+                      setMenuUsuario(false);
+                      navigate("/perfil");
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-4 text-gray-700 hover:bg-gray-50 transition"
+                  >
+                    <FaUserCog />
+                    Gestión de Perfil
+                  </button>
+                  
                   <button
                     onClick={cerrarSesion}
-                    className="w-full flex items-center gap-3 px-4 py-4 text-red-600 hover:bg-red-50 transition"
+                    className="w-full flex items-center gap-3 px-4 py-4 text-red-600 hover:bg-red-50 transition border-t"
                   >
                     <FaSignOutAlt />
                     Cerrar sesión
                   </button>
+                  
                 </div>
               )}
             </div>
