@@ -178,7 +178,6 @@ function Vehiculos() {
 
     try {
       const imagenUrl = imagenFile || "";
-      
 
       await createVehiculo({
         ...form,
@@ -192,6 +191,16 @@ function Vehiculos() {
       setImagenFile(null);
 
     } catch (error) {
+
+      if (
+        error?.response?.data?.error ===
+        "La matrícula ya existe"
+      ) {
+        alert("❌ La matrícula ya existe");
+        return;
+      }
+
+      alert("❌ Error al crear vehículo");
       console.log(error);
     }
   };
@@ -417,7 +426,7 @@ function Vehiculos() {
 
               <div className="space-y-2 text-sm text-gray-600 mb-5">
                 <p>
-                  <strong>Matrícula:</strong> {v.matricula}
+                  <strong>Matrícula:</strong> {v.matricula?.toUpperCase()}
                 </p>
                 <p>
                   <strong>Año:</strong> {v.anio}
@@ -502,7 +511,7 @@ function Vehiculos() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white w-full max-w-2xl p-6 rounded-3xl">
             <h2 className="text-2xl font-black mb-4">
-              Historial del vehículo {vehiculoHistorial.matricula}
+              Historial del vehículo {vehiculoHistorial.matricula?.toUpperCase()}
             </h2>
 
             <div className="space-y-3 max-h-[400px] overflow-y-auto">
@@ -604,7 +613,7 @@ function Vehiculos() {
 
               <input
                 name="matricula"
-                value={form.matricula}
+                value={form.matricula?.toUpperCase()}
                 onChange={handleChange}
                 placeholder="Matrícula"
                 className="border p-4 rounded-2xl"
