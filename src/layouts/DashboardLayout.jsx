@@ -6,7 +6,6 @@ import {
   FaCalendarAlt,
   FaSignOutAlt,
   FaHome,
-  FaBars,
   FaUserCog
 } from "react-icons/fa";
 
@@ -64,26 +63,26 @@ export default function DashboardLayout() {
   const puedeVerUsuarios = ["INGENIERO"].includes(rol);
 
   const menu = [
-    { name: "Inicio", path: "/", icon: <FaHome /> },
+    { name: "INICIO", path: "/", icon: <FaHome /> },
 
     ...(puedeVerVehiculos
-      ? [{ name: "Vehículos", path: "/vehiculos", icon: <FaCar /> }]
+      ? [{ name: "VEHICULOS", path: "/vehiculos", icon: <FaCar /> }]
       : []),
 
     {
-      name: "Operativos",
+      name: "OPERATIVOS",
       path: "/operativos",
       icon: <FaClipboardList />,
     },
 
     {
-      name: "Reservas",
+      name: "RESERVAS",
       path: "/reservas",
       icon: <FaCalendarAlt />,
     },
 
     ...(puedeVerUsuarios
-      ? [{ name: "Usuarios", path: "/usuarios", icon: <FaUsers /> }]
+      ? [{ name: "USUARIOS", path: "/usuarios", icon: <FaUsers /> }]
       : []),
   ];
 
@@ -92,23 +91,27 @@ export default function DashboardLayout() {
     "Dashboard";
 
   return (
-    <div className="flex min-h-screen bg-[#F4F7FB]">
+    <div className="flex min-h-screen bg-slate-100">
 
       {/* SIDEBAR */}
-      <aside className="w-72 bg-[#001B48] text-white flex flex-col shadow-2xl">
+      <aside className="w-72 bg-teal-800 text-white flex flex-col shadow-2xl">
 
         {/* LOGO */}
-        <div className="px-6 py-7 border-b border-blue-900">
+        <div className="px-6 py-7 border-b border-black/20">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center">
-              <FaCar className="text-2xl" />
+            <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center">
+              <img
+                src="/logo.ico"
+                alt="Logo"
+                className="w-10 h-10 object-contain"
+              />
             </div>
 
             <div>
               <h1 className="text-xl font-black">
                 GUARDIA REPUBLICANA
               </h1>
-              <p className="text-sm text-blue-100">
+              <p className="text-sm text-teal-100">
                 FLOTA VEHICULAR
               </p>
             </div>
@@ -129,8 +132,8 @@ export default function DashboardLayout() {
                   transition-all duration-200
                   ${
                     active
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "text-blue-100 hover:bg-blue-900"
+                      ? "bg-black text-white shadow-lg"
+                      : "text-white/90 hover:bg-black hover:text-white"
                   }
                 `}
               >
@@ -148,9 +151,9 @@ export default function DashboardLayout() {
 
         {/* HEADER */}
         <header className="h-24 bg-white border-b px-8 flex items-center justify-between">
-
+<header className="h-24 bg-white border-b border-teal-100 px-8 flex items-center justify-between"></header>
           <div className="flex items-center gap-5">
-            <FaBars className="text-gray-600 text-2xl" />
+            
 
             <div>
               <h1 className="text-2xl font-black text-gray-800">
@@ -176,9 +179,9 @@ export default function DashboardLayout() {
                 onClick={() =>
                   setMenuUsuario(!menuUsuario)
                 }
-                className="flex items-center gap-4 hover:bg-gray-100 px-3 py-2 rounded-xl transition"
+                className="flex items-center gap-4 hover:bg-teal-50 px-3 py-2 rounded-xl transition"
               >
-                <div className="w-14 h-14 rounded-full bg-blue-600 border-2 border-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-14 h-14 rounded-full bg-teal-800 border-2 border-teal-700 flex items-center justify-center text-white font-bold text-lg">
                   {`${usuario?.nombre?.[0] || ""}${usuario?.apellido?.[0] || ""}`.toUpperCase()}
                 </div>
 
